@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2024.1 (Build 263U)" ts="2024-07-25 16:44:18">
+<Project name="EnsExportProduction_2024-07-25 16-41-53_773+8" LastModified="2024-07-25 16:44:18.6169436">
+  <ProjectDescription>Studio Project generated from Production 'PROTOTYPEPKG.FoundationProduction' at 2024-07-25 08:41:53.773 UTC</ProjectDescription>
+  <Items>
+    <ProjectItem name="PROTOTYPEPKG.FoundationProduction" type="CLS"></ProjectItem>
+    <ProjectItem name="Prototype.PatientInsertionMessage" type="CLS"></ProjectItem>
+    <ProjectItem name="Prototype.PatientToHL7" type="CLS"></ProjectItem>
+    <ProjectItem name="User.MapSQLToHL7" type="CLS"></ProjectItem>
+    <ProjectItem name="EnsExportNotes.EnsExportProduction_2024-07-25 16-41-53_773+8.PTD" type="PTD"></ProjectItem>
+  </Items>
+</Project>
+
+
+<Class name="PROTOTYPEPKG.FoundationProduction">
+<ProcedureBlock>0</ProcedureBlock>
+<Super>Ens.Production</Super>
+<TimeChanged>67040,57702.8045392</TimeChanged>
+<TimeCreated>66991,38342.8560063</TimeCreated>
+
+<XData name="ProductionDefinition">
+<Data><![CDATA[
+<Production Name="PROTOTYPEPKG.FoundationProduction" TestingEnabled="true" LogGeneralTraceEvents="false">
+  <Description></Description>
+  <ActorPoolSize>1</ActorPoolSize>
+  <Item Name="IncomingSQL" Category="" ClassName="EnsLib.SQL.Service.GenericService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">User.MapSQLToHL7</Setting>
+    <Setting Target="Host" Name="MessageClass">Prototype.PatientInsertionMessage</Setting>
+    <Setting Target="Adapter" Name="KeyFieldName">PatientId</Setting>
+    <Setting Target="Adapter" Name="Query">SELECT TOP 1 * FROM Prototype_DB.Patients ORDER BY PatientId DESC</Setting>
+    <Setting Target="Adapter" Name="DSN">QS Prototype</Setting>
+    <Setting Target="Adapter" Name="Credentials">prototype_credentials</Setting>
+    <Setting Target="Adapter" Name="CallInterval">5</Setting>
+    <Setting Target="Adapter" Name="StayConnected">1</Setting>
+  </Item>
+  <Item Name="HL7Outgoing" Category="" ClassName="EnsLib.HL7.Operation.FileOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="FilePath">C:\Users\xili\OneDrive - InterSystems Corporation\Desktop\</Setting>
+    <Setting Target="Host" Name="Filename">%f_%Q%!+(_a).txt</Setting>
+  </Item>
+  <Item Name="User.MapSQLToHL7" Category="" ClassName="User.MapSQLToHL7" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="RuleLogging"></Setting>
+  </Item>
+</Production>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Prototype.PatientInsertionMessage">
+<Super>Ens.Request</Super>
+<TimeChanged>67024,42266.1174858</TimeChanged>
+<TimeCreated>67024,42225.7795783</TimeCreated>
+
+<Property name="PatientId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Name">
+<Type>%String</Type>
+</Property>
+
+<Property name="Title">
+<Type>%String</Type>
+</Property>
+
+<Property name="Gender">
+<Type>%String</Type>
+</Property>
+
+<Property name="DOB">
+<Type>%Date</Type>
+</Property>
+
+<Property name="OrderedBy">
+<Type>%String</Type>
+</Property>
+
+<Property name="DateOfOrder">
+<Type>%Date</Type>
+</Property>
+
+<Property name="DateOfReport">
+<Type>%Date</Type>
+</Property>
+
+<Property name="Ethnicity">
+<Type>%String</Type>
+</Property>
+
+<Property name="HN">
+<Type>%String</Type>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DefaultData>PatientInsertionMessageDefaultData</DefaultData>
+<Data name="PatientInsertionMessageDefaultData">
+<Structure>listnode</Structure>
+<Subscript>"PatientInsertionMessage"</Subscript>
+<Value name="1">
+<Value>PatientId</Value>
+</Value>
+<Value name="2">
+<Value>Name</Value>
+</Value>
+<Value name="3">
+<Value>Title</Value>
+</Value>
+<Value name="4">
+<Value>Gender</Value>
+</Value>
+<Value name="5">
+<Value>DOB</Value>
+</Value>
+<Value name="6">
+<Value>OrderedBy</Value>
+</Value>
+<Value name="7">
+<Value>DateOfOrder</Value>
+</Value>
+<Value name="8">
+<Value>DateOfReport</Value>
+</Value>
+<Value name="9">
+<Value>Ethnicity</Value>
+</Value>
+<Value name="10">
+<Value>HN</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Prototype.PatientToHL7">
+<Super>Ens.DataTransformDTL</Super>
+<TimeChanged>67043,59338.1746019</TimeChanged>
+<TimeCreated>67024,42508.9967399</TimeCreated>
+<DependsOn>Prototype.PatientInsertionMessage,EnsLib.HL7.Message</DependsOn>
+
+<Parameter name="IGNOREMISSINGSOURCE">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="REPORTERRORS">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="TREATEMPTYREPEATINGFIELDASNULL">
+<Default>0</Default>
+</Parameter>
+
+<XData name="DTL">
+<XMLNamespace>http://www.intersystems.com/dtl</XMLNamespace>
+<Data><![CDATA[
+<transform sourceClass='Prototype.PatientInsertionMessage' targetClass='EnsLib.HL7.Message' targetDocType='2.6:ADT_A01' create='new' language='objectscript' >
+<assign value='source.Gender' property='target.{PID:AdministrativeSex}' action='set' />
+<assign value='source.DOB' property='target.{PID:DateTimeofBirth}' action='set' />
+<assign value='source.HN' property='target.{PID:PatientID}' action='set' />
+<assign value='source.Ethnicity' property='target.{PID:Race(1).Text}' action='set' />
+<assign value='source.Title' property='target.{PID:PatientName(1).Prefix}' action='set' />
+<assign value='source.Name' property='target.{PID:PatientName(1).GivenName}' action='set' />
+</transform>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="User.MapSQLToHL7">
+<Description>
+</Description>
+<Super>Ens.BusinessProcessBPL</Super>
+<TimeChanged>67040,55183.203814</TimeChanged>
+<TimeCreated>67022,47114.0027569</TimeCreated>
+
+<XData name="BPL">
+<Description>
+BPL Definition</Description>
+<XMLNamespace>http://www.intersystems.com/bpl</XMLNamespace>
+<Data><![CDATA[
+<process language='objectscript' request='Prototype.PatientInsertionMessage' response='Ens.Response' height='2000' width='2000' >
+<context>
+<property name='TransformedHL7' type='EnsLib.HL7.Message' instantiate='0' />
+</context>
+<sequence xend='200' yend='450' >
+<transform name='Patient to HL7 Message' class='Prototype.PatientToHL7' source='request' target='context.TransformedHL7' xpos='200' ypos='250' />
+<call name='Call Outgoing' target='HL7Outgoing' async='1' xpos='200' ypos='350' >
+<request type='EnsLib.HL7.Message' >
+<assign property="callrequest" value="context.TransformedHL7" action="set" languageOverride="" />
+</request>
+<response type='Ens.Response' />
+</call>
+</sequence>
+</process>
+]]></Data>
+</XData>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+</Storage>
+</Class>
+
+
+<Document name="EnsExportNotes.EnsExportProduction_2024-07-25 16-41-53_773+8.PTD"><ProjectTextDocument name="EnsExportNotes.EnsExportProduction_2024-07-25 16-41-53_773+8" description="Export Notes for export EnsExportProduction_2024-07-25 16-41-53_773+8">
+<![CDATA[<Deployment>
+<Creation>
+<Machine>SG7400SPARE.ISCINTERNAL.COM</Machine>
+<Instance>QS</Instance>
+<Namespace>PROTOTYPE</Namespace>
+<SourceProduction>PROTOTYPEPKG.FoundationProduction</SourceProduction>
+<Username>_SYSTEM</Username>
+<UTC>2024-07-25 08:44:18.614</UTC>
+</Creation>
+<Notes>
+</Notes>
+<Contents>
+<ExportProject>EnsExportProduction_2024-07-25 16-41-53_773+8</ExportProject>
+<Item num="1">PROTOTYPEPKG.FoundationProduction.CLS</Item>
+<Item num="2">Prototype.PatientInsertionMessage.CLS</Item>
+<Item num="3">Prototype.PatientToHL7.CLS</Item>
+<Item num="4">User.MapSQLToHL7.CLS</Item>
+</Contents>
+<ProductionClassInExport>PROTOTYPEPKG.FoundationProduction</ProductionClassInExport>
+</Deployment>
+
+]]></ProjectTextDocument>
+</Document></Export>
