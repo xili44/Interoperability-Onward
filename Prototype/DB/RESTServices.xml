@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2024.1 (Build 267_2U)" ts="2024-09-17 10:18:29">
+<Class name="Prototype.DB.RESTServices">
+<Super>%CSP.REST</Super>
+<TimeChanged>67096,52167.652555</TimeChanged>
+<TimeCreated>67095,59139.5247187</TimeCreated>
+
+<Parameter name="CONTENTTYPE">
+<Default>application/json</Default>
+</Parameter>
+
+<Parameter name="HandleCorsRequest">
+<Default>1</Default>
+</Parameter>
+
+<XData name="UrlMap">
+<XMLNamespace>http://www/intersystems.com/urlmap</XMLNamespace>
+<Data><![CDATA[
+<Routes>
+    <Route Url = "/patients" Method="GET" Call="GetPatients"/>
+    <Route Url = "/patient/:id" Method="PUT" Call="UpdatePatientName"/>
+    <Route Url = "/patient" Method="POST" Call="CreateNewPatient"/>
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="OnPreDispatch">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Do %response.SetHeader("Access-Control-Allow-Origin", "*")
+    Do %response.SetHeader("Access-Control-Allow-Credentials","true")
+    Do %response.SetHeader("Access-Control-Allow-Methods","GET, PUT, POST, DELETE, OPTIONS")
+    Do %response.SetHeader("Access-Control-Max-Age","10000")
+    Do %response.SetHeader("Access-Control-Allow-Headers","Content-Type, Authorization, Accept-Language, X-Requested-With,append,delete,entries,foreach,get,has,keys,set,values,options")
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetPatients">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #Dim tStatus As %Status = $$$OK
+
+    #Dim tSQL As %String = "SELECT * FROM Prototype_DB.Patients ORDER BY Name"
+
+    #Dim tStatement As %SQL.Statement = ##class(%SQL.Statement).%New()
+    
+    Set tStatus = tStatement.%Prepare(tSQL)
+
+    If ($$$ISERR(tStatus)) Return ..ReportHttpStatusCode(..#HTTP400BADREQUEST, tStatus)
+
+    #Dim tResultSet As %SQL.StatementResult
+
+    Set tResultSet = tStatement.%Execute()
+
+    #Dim tPatients As %DynamicArray = []
+
+    While (tResultSet.%Next()) {
+        #Dim tPatient As %DynamicObject = {}
+        Set tPatient.ID = tResultSet.ID
+        Set tPatient.Name = tResultSet.Name
+        Set tPatient.Title = tResultSet.Title
+        Set tPatient.Gender = tResultSet.Gender
+        Set tPatient.DOB = $ZDATE(tResultSet.DOB, 3)
+        Set tPatient.OrderedBy = tResultSet.OrderedBy
+        Set tPatient.DateOfOrder = $ZDATE(tResultSet.DateOfOrder, 3)
+        Set tPatient.DateOfReport = $ZDATE(tResultSet.DateOfReport, 3)
+        Set tPatient.Ethnicity = tResultSet.Ethnicity
+        Set tPatient.HN = tResultSet.HN
+        Do tPatients.%Push(tPatient)
+    }
+    Do ##class(%JSON.Formatter).%New().Format(tPatients)
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UpdatePatientName">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pID:%Integer</FormalSpec>
+<Implementation><![CDATA[
+    #Dim tStatus As %Status = $$$OK
+    #Dim tPatient As Prototype.DB.Patients = ##class(Prototype.DB.Patients).%OpenId(pID,, .tStatus)
+    If ($$$ISERR(tStatus)) Return ..ReportHttpStatusCode(..#HTTP404NOTFOUND, tStatus)
+    #Dim tJSONIn As %DynamicObject = ##class(%DynamicObject).%FromJSON(%request.Content)
+    Set tPatient.Name = tJSONIn.Name
+    Set tStatus = tPatient.%Save()
+    If ($$$ISERR(tStatus)) Return ..ReportHttpStatusCode(..#HTTP400BADREQUEST, tStatus)
+    #Dim tJSONOut As %DynamicObject = {}
+    Set tJSONOut.message = "patient name updated successfully"
+    Set tJSONOut.patient = ##class(%DynamicObject).%New()
+    Set tJSONOut.patient.ID = tPatient.%Id()
+    Set tJSONOut.patient.Name = tPatient.Name
+    Do ##class(%JSON.Formatter).%New().Format(tJSONOut)
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateNewPatient">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+    #Dim tStatus As %Status = $$$OK
+    #Dim tPatient As Prototype.DB.Patients=##class(Prototype.DB.Patients).%New()
+    Set data=%request.Content
+    Set tStatus = tPatient.%JSONImport(data)
+    If ($$$ISERR(tStatus)) Return ..ReportHttpStatusCode(..#HTTP400BADREQUEST,tStatus)
+    Set tStatus = tPatient.%Save()
+    If ($$$ISERR(tStatus)) Return ..ReportHttpStatusCode(..#HTTP400BADREQUEST, tStatus)
+    Do tPatient.%JSONExportToString(.patientJSONString)
+    #Dim patientObj As %DynamicObject = ##class(%DynamicAbstractObject).%FromJSON(patientJSONString)
+    Set patientObj.DOB = $ZDATE(tPatient.DOB, 3)
+    Set patientObj.ID = tPatient.%Id()
+    Write patientObj.%ToJSON()
+    Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
