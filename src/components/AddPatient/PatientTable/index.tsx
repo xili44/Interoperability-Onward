@@ -67,7 +67,7 @@ const PatientTable: React.FC<PatientTablePropsType> = ({
         message: string;
         patient: { ID: number; Name: string };
       } = await (
-        await fetch(`http://127.0.0.1:52773/api/prototype/patient/${ID}`, {
+        await fetch(`http://127.0.0.1:80/api/prototype/patient/${ID}`, {
           method: "PUT",
           headers: {
             Authorization: authorization,

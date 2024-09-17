@@ -10,7 +10,7 @@ const AddPatient: React.FC<AddPatientPropsType> = ({ getPatientData }) => {
   const handleSubmitForm = async (values: any) => {
     values.DOB = dayjs(values.DOB).format("YYYY-MM-DD");
     await (
-      await fetch("http://localhost:52773/api/prototype/patient", {
+      await fetch("http://localhost:80/api/prototype/patient", {
         method: "POST",
         body: JSON.stringify(values),
         headers: {

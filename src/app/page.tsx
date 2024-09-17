@@ -10,7 +10,7 @@ const HomePage: NextPage = () => {
     try {
       ("use server");
       const response: IPatient[] = await (
-        await fetch("http://localhost:52773/api/prototype/patients", {
+        await fetch("http://localhost:80/api/prototype/patients", {
           method: "GET",
           cache: "no-cache",
           headers: {
