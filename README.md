@@ -4,7 +4,7 @@
 
 ### Install Node.js
 
-Install [node.js](https://nodejs.org/en/download/package-manager) on your local machine, this project is built with node v20.14.0
+Install [node.js](https://nodejs.org/en/download/package-manager) on your local machine, this project is built with node v20.17.0
 
 ### Install project dependencies
 
@@ -43,7 +43,7 @@ Download the `Prototype` folder and import the folder on the Management Portal i
 - Fill in the form as shown below
 ![management portal](/public/management_portal.png)
 
-- The APIs defined in `Prototype/DB/RESTServices.cls` will be available at `http://localhost:52773/api/prototype/*`
+- The APIs defined in `Prototype/DB/RESTServices.cls` will be available at `http://localhost:80/api/prototype/*`
   - e.g. For example, the route `/patient` will be available at `http://localhost:52773/api/prototype/patients`
   - ![rest api](/public/restservices.png)
 
@@ -60,3 +60,20 @@ Download the `Prototype` folder and import the folder on the Management Portal i
 
 - Enter the path and name of import file, select the namespace and schema to import to and click `Finish`.
 ![wizard](/public/Wizard.png)
+
+### Production configuration
+
+- Business service: set up DSN and credentials
+- Business operation: create folder for file path output
+![production](/public/production.png)
+
+
+## Running
+1. Add Patient
+ ![addpatient](/public/addpatient.png) 
+
+2. Open visual trace
+![visualtrace](/public/visualtrace.png)   
+
+3. Check output txt file
+![output](/public/output.png)
