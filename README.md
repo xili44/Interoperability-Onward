@@ -44,7 +44,7 @@ Download the `Prototype` folder and import the folder on the Management Portal i
 ![management portal](/public/management_portal.png)
 
 - The APIs defined in `Prototype/DB/RESTServices.cls` will be available at `http://localhost:80/api/prototype/*`
-  - e.g. For example, the route `/patient` will be available at `http://localhost:52773/api/prototype/patients`
+  - e.g. For example, the route `/patient` will be available at `http://localhost:80/api/prototype/patients`
   - ![rest api](/public/restservices.png)
 
 ### Importing Data
@@ -61,12 +61,15 @@ Download the `Prototype` folder and import the folder on the Management Portal i
 - Enter the path and name of import file, select the namespace and schema to import to and click `Finish`.
 ![wizard](/public/Wizard.png)
 
-### Production configuration
+## Production Configuration
 
 - Business service: set up DSN and credentials
 - Business operation: create folder for file path output
 ![production](/public/production.png)
 
+## Instance Port and Authentication Setup
+- Port number of the IRIS instance (I'm using port 80)
+- auth.ts username and password (make sure CSPSystem user has READ privilege)
 
 ## Running
 1. Add Patient
